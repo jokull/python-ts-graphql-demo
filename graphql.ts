@@ -16,7 +16,7 @@ export type Scalars = {
 
 export type AddLocationResponse = Location | LocationExists;
 
-export type AddTaskResponse = Task;
+export type AddTaskResponse = LocationNotFound | Task;
 
 export type Location = {
   __typename?: 'Location';
@@ -26,6 +26,11 @@ export type Location = {
 
 export type LocationExists = {
   __typename?: 'LocationExists';
+  message: Scalars['String'];
+};
+
+export type LocationNotFound = {
+  __typename?: 'LocationNotFound';
   message: Scalars['String'];
 };
 
@@ -79,7 +84,7 @@ export type AddTaskMutationVariables = Exact<{
 }>;
 
 
-export type AddTaskMutation = { __typename?: 'Mutation', addTask: { __typename: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined } };
+export type AddTaskMutation = { __typename?: 'Mutation', addTask: { __typename: 'LocationNotFound', message: string } | { __typename: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined } };
 
 export type AddLocationMutationVariables = Exact<{
   name: Scalars['String'];
@@ -129,6 +134,10 @@ export const AddTaskDocument = gql`
     mutation AddTask($name: String!, $locationName: String!) {
   addTask(name: $name, locationName: $locationName) {
     __typename
+    ... on LocationNotFound {
+      __typename
+      message
+    }
     ... on Task {
       __typename
       ...TaskFields

@@ -122,16 +122,11 @@ const AddTask: React.FC = () => {
     makeCleanAfterSubmit: false,
     onSubmit: async ({ name, locationName }) => {
       const { data } = await mutation({ name, locationName });
-      // if (data?.addTask.__typename === "LocationNotFound")
-      //   return {
-      //     status: "fail",
-      //     errors: [
-      //       {
-      //         message: data.addTask.message,
-      //         field: ["locationName"],
-      //       },
-      //     ],
-      //   };
+      if (data?.addTask.__typename === "LocationNotFound")
+        return {
+          status: "fail",
+          errors: [{ message: data.addTask.message, field: ["locationName"] }],
+        };
       reset();
       return { status: "success" };
     },
