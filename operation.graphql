@@ -26,10 +26,10 @@ fragment LocationFields on Location {
 mutation AddTask($name: String!, $locationName: String!) {
   addTask(name: $name, locationName: $locationName) {
     __typename
-    ... on LocationNotFound {
-      __typename
-      message
-    }
+    # ... on LocationNotFound {
+    #   __typename
+    #   message
+    # }
     ... on Task {
       __typename
       ...TaskFields

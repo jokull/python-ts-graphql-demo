@@ -33,12 +33,12 @@ class Task:
         )
 
 
-@strawberry.type
-class LocationNotFound:
-    message: str = "Location with this name does not exist"
+# @strawberry.type
+# class LocationNotFound:
+#     message: str = "Location with this name does not exist"
 
 
-AddTaskResponse = strawberry.union("AddTaskResponse", (Task, LocationNotFound))
+AddTaskResponse = strawberry.union("AddTaskResponse", (Task,))
 
 
 @strawberry.type
@@ -58,8 +58,8 @@ class Mutation:
             if location_name:
                 sql = select(models.Location).where(models.Location.name == location_name)
                 db_location = (await s.execute(sql)).scalars().first()
-                if db_location is None:
-                    return LocationNotFound()
+                # if db_location is None:
+                #     return LocationNotFound()
             db_task = models.Task(name=name, location=db_location)
             s.add(db_task)
             await s.commit()

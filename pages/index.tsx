@@ -1,12 +1,13 @@
 import { Field, notEmptyString, useField, useForm } from "@shopify/react-form";
 import type { NextPage } from "next";
 import Head from "next/head";
+import Image from "next/image";
 import { useMemo } from "react";
 import {
   useAddLocationMutation,
   useAddTaskMutation,
-  useTasksQuery,
   useLocationsQuery,
+  useTasksQuery,
 } from "../graphql";
 
 const Pill: React.FC = ({ children }) => (
@@ -122,11 +123,11 @@ const AddTask: React.FC = () => {
     makeCleanAfterSubmit: false,
     onSubmit: async ({ name, locationName }) => {
       const { data } = await mutation({ name, locationName });
-      if (data?.addTask.__typename === "LocationNotFound")
-        return {
-          status: "fail",
-          errors: [{ message: data.addTask.message, field: ["locationName"] }],
-        };
+      // if (data?.addTask.__typename === "LocationNotFound")
+      //   return {
+      //     status: "fail",
+      //     errors: [{ message: data.addTask.message, field: ["locationName"] }],
+      //   };
       reset();
       return { status: "success" };
     },
@@ -170,8 +171,13 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="max-w-2xl mx-auto p-4 min-h-screen flex flex-col justify-center">
-        <h1 className="text-4xl md:text-7xl md:leading-loose md:text-center font-extrabold">
-          Mini Inch
+        <h1 className="flex">
+          <div className="text-4xl md:text-7xl md:text-center font-extrabold">
+            Mini Inch
+          </div>
+          <div className="pl-4 pt-5 w-16">
+            <Image height={52} width={52} alt="Panda" src="/panda.svg" />
+          </div>
         </h1>
         <AddLocation />
         <AddTask />
