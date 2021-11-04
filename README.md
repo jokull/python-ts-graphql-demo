@@ -1,3 +1,5 @@
+![](https://user-images.githubusercontent.com/701/140308942-264f40fa-f6ac-43cf-88f0-b6c4bfdfe105.mp4)
+
 ## Getting started
 
 Install Python and NPM packages
@@ -36,3 +38,5 @@ npm run dev
 ```
 
 ![](https://ss.solberg.is/chu0zY+)
+
+
