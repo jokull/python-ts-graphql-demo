@@ -16,20 +16,16 @@ export type Scalars = {
 
 export type AddLocationResponse = Location | LocationExists;
 
-export type AddTaskResponse = LocationNotFound | Task;
+export type AddTaskResponse = Task;
 
 export type Location = {
   __typename?: 'Location';
+  id: Scalars['ID'];
   name: Scalars['String'];
 };
 
 export type LocationExists = {
   __typename?: 'LocationExists';
-  message: Scalars['String'];
-};
-
-export type LocationNotFound = {
-  __typename?: 'LocationNotFound';
   message: Scalars['String'];
 };
 
@@ -46,27 +42,36 @@ export type MutationAddLocationArgs = {
 
 
 export type MutationAddTaskArgs = {
-  locationName: Scalars['String'];
+  locationName?: Maybe<Scalars['String']>;
   name: Scalars['String'];
 };
 
 export type Query = {
   __typename?: 'Query';
+  locations: Array<Location>;
   tasks: Array<Task>;
 };
 
 export type Task = {
   __typename?: 'Task';
+  id: Scalars['ID'];
   location?: Maybe<Location>;
   name: Scalars['String'];
 };
 
-export type GetTasksQueryVariables = Exact<{ [key: string]: never; }>;
+export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTasksQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', name: string, location?: { __typename?: 'Location', name: string } | null | undefined }> };
+export type TasksQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined }> };
 
-export type TaskFieldsFragment = { __typename?: 'Task', name: string, location?: { __typename?: 'Location', name: string } | null | undefined };
+export type LocationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LocationsQuery = { __typename?: 'Query', locations: Array<{ __typename?: 'Location', id: string, name: string }> };
+
+export type TaskFieldsFragment = { __typename?: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined };
+
+export type LocationFieldsFragment = { __typename?: 'Location', id: string, name: string };
 
 export type AddTaskMutationVariables = Exact<{
   name: Scalars['String'];
@@ -74,42 +79,56 @@ export type AddTaskMutationVariables = Exact<{
 }>;
 
 
-export type AddTaskMutation = { __typename?: 'Mutation', addTask: { __typename: 'LocationNotFound', message: string } | { __typename: 'Task', name: string, location?: { __typename?: 'Location', name: string } | null | undefined } };
+export type AddTaskMutation = { __typename?: 'Mutation', addTask: { __typename: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined } };
 
 export type AddLocationMutationVariables = Exact<{
   name: Scalars['String'];
 }>;
 
 
-export type AddLocationMutation = { __typename?: 'Mutation', addLocation: { __typename: 'Location', name: string } | { __typename: 'LocationExists', message: string } };
+export type AddLocationMutation = { __typename?: 'Mutation', addLocation: { __typename: 'Location', id: string, name: string } | { __typename: 'LocationExists', message: string } };
 
 export const TaskFieldsFragmentDoc = gql`
     fragment TaskFields on Task {
+  id
   name
   location {
     name
   }
 }
     `;
-export const GetTasksDocument = gql`
-    query getTasks {
+export const LocationFieldsFragmentDoc = gql`
+    fragment LocationFields on Location {
+  id
+  name
+}
+    `;
+export const TasksDocument = gql`
+    query Tasks {
   tasks {
     ...TaskFields
   }
 }
     ${TaskFieldsFragmentDoc}`;
 
-export function useGetTasksQuery(options: Omit<Urql.UseQueryArgs<GetTasksQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<GetTasksQuery>({ query: GetTasksDocument, ...options });
+export function useTasksQuery(options: Omit<Urql.UseQueryArgs<TasksQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<TasksQuery>({ query: TasksDocument, ...options });
+};
+export const LocationsDocument = gql`
+    query Locations {
+  locations {
+    ...LocationFields
+  }
+}
+    ${LocationFieldsFragmentDoc}`;
+
+export function useLocationsQuery(options: Omit<Urql.UseQueryArgs<LocationsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<LocationsQuery>({ query: LocationsDocument, ...options });
 };
 export const AddTaskDocument = gql`
     mutation AddTask($name: String!, $locationName: String!) {
   addTask(name: $name, locationName: $locationName) {
     __typename
-    ... on LocationNotFound {
-      __typename
-      message
-    }
     ... on Task {
       __typename
       ...TaskFields
@@ -131,11 +150,11 @@ export const AddLocationDocument = gql`
     }
     ... on Location {
       __typename
-      name
+      ...LocationFields
     }
   }
 }
-    `;
+    ${LocationFieldsFragmentDoc}`;
 
 export function useAddLocationMutation() {
   return Urql.useMutation<AddLocationMutation, AddLocationMutationVariables>(AddLocationDocument);

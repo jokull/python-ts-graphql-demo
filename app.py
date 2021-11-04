@@ -4,39 +4,41 @@ import strawberry
 from sqlalchemy import select
 from starlette.applications import Starlette
 from strawberry.asgi import GraphQL
-from strawberry.extensions import Extension
 
 import models
 
 
 @strawberry.type
 class Location:
+    id: strawberry.ID
     name: str
 
     @classmethod
     def marshal(cls, model: models.Location) -> "Location":
-        return cls(name=model.name)
+        return cls(id=str(model.id), name=model.name)
 
 
 @strawberry.type
 class Task:
+    id: strawberry.ID
     name: str
     location: Optional[Location] = None
 
     @classmethod
     def marshal(cls, model: models.Task) -> "Task":
         return cls(
+            id=str(model.id),
             name=model.name,
             location=Location.marshal(model.location) if model.location else None,
         )
 
 
-@strawberry.type
-class LocationNotFound:
-    message: str = "Location with this name does not exist"
+# @strawberry.type
+# class LocationNotFound:
+#     message: str = "Location with this name does not exist"
 
 
-AddTaskResponse = strawberry.union("AddTaskResponse", [Task, LocationNotFound])
+AddTaskResponse = strawberry.union("AddTaskResponse", [Task])
 
 
 @strawberry.type
@@ -54,10 +56,10 @@ class Mutation:
         async with models.get_session() as s:
             db_location = None
             if location_name:
-                sql = select(models.Location).where(models.Location.name == location_name).limit(1)
+                sql = select(models.Location).where(models.Location.name == location_name)
                 db_location = (await s.execute(sql)).scalars().first()
-                if db_location is None:
-                    return LocationNotFound()
+                # if db_location is None:
+                #     return LocationNotFound()
             db_task = models.Task(name=name, location=db_location)
             s.add(db_task)
             await s.commit()
@@ -67,7 +69,7 @@ class Mutation:
     async def add_location(self, name: str) -> AddLocationResponse:
         async with models.get_session() as s:
             sql = select(models.Location).where(models.Location.name == name)
-            db_location = (await s.execute(sql)).scalars().first()
+            db_location = (await s.execute(sql)).first()
             if db_location is not None:
                 return LocationExists()
             db_location = models.Location(name=name)
@@ -82,23 +84,15 @@ class Query:
     async def tasks(self) -> list[Task]:
         async with models.get_session() as s:
             sql = select(models.Task).order_by(models.Task.name)
-            db_tasks = (await s.execute(sql)).scalars().all()
-            return [
-                Task(
-                    name=t.name,
-                    location=Location(name=t.location.name),
-                )
-                for t in db_tasks
-            ]
+            db_tasks = (await s.execute(sql)).scalars().unique().all()
+        return [Task.marshal(task) for task in db_tasks]
 
-
-# class DatabaseExtension(Extension):
-#     async def on_request_start(self):
-#         async with models.get_session() as session:
-#             self.execution_context.context["db"] = session
-
-#     async def on_request_end(self):
-#         await self.execution_context.context["db"].close()
+    @strawberry.field
+    async def locations(self) -> list[Location]:
+        async with models.get_session() as s:
+            sql = select(models.Location).order_by(models.Location.name)
+            db_locations = (await s.execute(sql)).scalars().unique().all()
+        return [Location.marshal(loc) for loc in db_locations]
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

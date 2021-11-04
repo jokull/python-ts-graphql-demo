@@ -1,10 +1,10 @@
 ## Getting started
 
-Regenerate the schema and codegen
+Install Python and NPM packages
 
 ```bash
-poetry run strawberry export-schema app:schema > schema.graphql
-npm run codegen
+poetry install
+npm i
 ```
 
 Drop and recreate all database tables
@@ -13,14 +13,26 @@ Drop and recreate all database tables
 poetry run python models.py
 ```
 
-Run the backend
+Run the Python GraphQL backend on port :8000 - Next.js will reverse proxy `/graphql` to here
 
 ```bash
 poetry run uvicorn app:app --reload
 ```
+
+![](https://ss.solberg.is/7GOZ7I+)
+
+Start the GraphQL server
+
+```bash
+npm run codegen --watch
+```
+
+![](https://ss.solberg.is/hTHyzj+)
 
 Run the frontend
 
 ```bash
 npm run dev
 ```
+
+![](https://ss.solberg.is/chu0zY+)
