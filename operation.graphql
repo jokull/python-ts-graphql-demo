@@ -1,0 +1,40 @@
+query getTasks {
+  tasks {
+    ...TaskFields
+  }
+}
+
+fragment TaskFields on Task {
+  name
+  location {
+    name
+  }
+}
+
+mutation AddTask($name: String!, $locationName: String!) {
+  addTask(name: $name, locationName: $locationName) {
+    __typename
+    ... on LocationNotFound {
+      __typename
+      message
+    }
+    ... on Task {
+      __typename
+      ...TaskFields
+    }
+  }
+}
+
+mutation AddLocation($name: String!) {
+  addLocation(name: $name) {
+    __typename
+    ... on LocationExists {
+      __typename
+      message
+    }
+    ... on Location {
+      __typename
+      name
+    }
+  }
+}

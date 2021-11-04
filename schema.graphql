@@ -1,0 +1,29 @@
+union AddLocationResponse = Task | LocationExists
+
+union AddTaskResponse = Task | LocationNotFound
+
+type Location {
+  name: String!
+}
+
+type LocationExists {
+  message: String!
+}
+
+type LocationNotFound {
+  message: String!
+}
+
+type Mutation {
+  addTask(name: String!, locationName: String!): AddTaskResponse!
+  addLocation(name: String!): AddLocationResponse!
+}
+
+type Query {
+  tasks: [Task!]!
+}
+
+type Task {
+  name: String!
+  location: Location
+}

@@ -1,0 +1,17 @@
+{
+  "editor.formatOnSave": true,
+  "python.linting.banditEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.enabled": true,
+  "python.formatting.provider": "black",
+  "python.analysis.typeCheckingMode": "basic",
+  // "python.sortImports.path": "isort",
+  "python.sortImports.args": ["--settings=pyproject.toml"],
+  "python.linting.flake8Args": ["--max-line-length=99"],
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  }
+}
