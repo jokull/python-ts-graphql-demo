@@ -1,6 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -22,9 +22,9 @@ class Task(Base):
     __tablename__ = "tasks"
     id: int = Column(Integer, primary_key=True, index=True)
     name: str = Column(String, nullable=False)
-    location_id: str = Column(Integer, ForeignKey(Location.id), nullable=True)
+    location_id: Optional[int] = Column(Integer, ForeignKey(Location.id), nullable=True)
 
-    location: Location = relationship(Location, lazy="joined", back_populates="tasks")
+    location: Optional[Location] = relationship(Location, lazy="joined", back_populates="tasks")
 
 
 engine = create_async_engine(

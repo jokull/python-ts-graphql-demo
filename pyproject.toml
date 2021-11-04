@@ -19,6 +19,7 @@ flake8 = "^4.0.1"
 isort = "^5.10.0"
 bandit = "^1.7.0"
 sqlalchemy2-stubs = "^0.0.2-alpha.19"
+mypy = "^0.910"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -32,3 +33,7 @@ profile = "black"
 
 [tool.flake8]
 max-line-length = 99
+
+[tool.mypy]
+plugins = "strawberry.ext.mypy_plugin,sqlalchemy.ext.mypy.plugin"
+implicit_reexport = false
