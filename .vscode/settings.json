@@ -1,16 +1,24 @@
 {
   "editor.formatOnSave": true,
-  "python.linting.banditEnabled": false,
   "python.linting.flake8Enabled": true,
-  "python.linting.pylintEnabled": false,
   "python.linting.mypyEnabled": true,
+  "python.linting.mypyArgs": [
+    "--follow-imports=silent",
+    "--ignore-missing-imports",
+    "--show-column-numbers",
+    "--no-pretty",
+    "--config-file",
+    "${workspaceFolder}/mypy.ini"
+  ],
   "python.linting.enabled": true,
-  "mypy.targets": ["app.py"],
-  "mypy.runUsingActiveInterpreter": true,
   "python.formatting.provider": "black",
-  "python.analysis.typeCheckingMode": "basic",
-  "python.languageServer": "None",
+  "python.formatting.blackArgs": [
+    "--config",
+    "${workspaceFolder}/pyproject.toml"
+  ],
   "python.sortImports.args": ["--settings=pyproject.toml"],
+  "python.analysis.typeCheckingMode": "off",
+  "python.languageServer": "Pylance",
   "python.linting.flake8Args": ["--max-line-length=99"],
   "[python]": {
     "editor.codeActionsOnSave": {
