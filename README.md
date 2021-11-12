@@ -25,7 +25,7 @@ poetry run python models.py
 Run the Python GraphQL backend on port :8000 - Next.js will reverse proxy `/graphql` to here
 
 ```bash
-poetry run uvicorn app:app --reload
+poetry run uvicorn app:app --reload --host '::'
 ```
 
 ![](https://ss.solberg.is/7GOZ7I+)
