@@ -12,6 +12,8 @@ starlette = "^0.16.0"
 uvicorn = "^0.15.0"
 aiosqlite = "^0.17.0"
 greenlet = "^1.1.2"
+aioredis = "^2.0.0"
+websockets = "^10.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"

@@ -7,6 +7,7 @@ import {
   useAddLocationMutation,
   useAddTaskMutation,
   useLocationsQuery,
+  useTaskAddedSubscription,
   useTasksQuery,
 } from "../graphql";
 
@@ -55,6 +56,11 @@ const Locations: React.FC = () => {
 const Tasks: React.FC = () => {
   const context = useMemo(() => ({ additionalTypenames: ["Task"] }), []);
   const [{ data, fetching }] = useTasksQuery({ context });
+  const [taskAddedResponse] = useTaskAddedSubscription();
+
+  console.log(taskAddedResponse);
+  console.log(taskAddedResponse.data?.taskAdded);
+
   if (fetching) return <div>Loading</div>;
   if (data?.tasks.length === 0) return <div>No tasks yet</div>;
   return (

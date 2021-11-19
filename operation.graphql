@@ -50,3 +50,9 @@ mutation AddLocation($name: String!) {
     }
   }
 }
+
+subscription TaskAdded {
+  taskAdded {
+    ...TaskFields
+  }
+}

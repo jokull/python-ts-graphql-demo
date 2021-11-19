@@ -1,6 +1,7 @@
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -42,7 +43,7 @@ export type MutationAddLocationArgs = {
 
 
 export type MutationAddTaskArgs = {
-  locationName?: Maybe<Scalars['String']>;
+  locationName?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
 };
 
@@ -50,6 +51,11 @@ export type Query = {
   __typename?: 'Query';
   locations: Array<Location>;
   tasks: Array<Task>;
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  taskAdded: Task;
 };
 
 export type Task = {
@@ -87,6 +93,11 @@ export type AddLocationMutationVariables = Exact<{
 
 
 export type AddLocationMutation = { __typename?: 'Mutation', addLocation: { __typename: 'Location', id: string, name: string } | { __typename: 'LocationExists', message: string } };
+
+export type TaskAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TaskAddedSubscription = { __typename?: 'Subscription', taskAdded: { __typename?: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined } };
 
 export const TaskFieldsFragmentDoc = gql`
     fragment TaskFields on Task {
@@ -158,4 +169,15 @@ export const AddLocationDocument = gql`
 
 export function useAddLocationMutation() {
   return Urql.useMutation<AddLocationMutation, AddLocationMutationVariables>(AddLocationDocument);
+};
+export const TaskAddedDocument = gql`
+    subscription TaskAdded {
+  taskAdded {
+    ...TaskFields
+  }
+}
+    ${TaskFieldsFragmentDoc}`;
+
+export function useTaskAddedSubscription<TData = TaskAddedSubscription>(options: Omit<Urql.UseSubscriptionArgs<TaskAddedSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<TaskAddedSubscription, TData>) {
+  return Urql.useSubscription<TaskAddedSubscription, TData, TaskAddedSubscriptionVariables>({ query: TaskAddedDocument, ...options }, handler);
 };
