@@ -1,4 +1,4 @@
-import { createClient as createWSClient, Client as WSClient } from "graphql-ws";
+import { createClient as createWSClient } from "graphql-ws";
 import type { AppProps } from "next/app";
 import "tailwindcss/tailwind.css";
 import {
@@ -8,16 +8,14 @@ import {
   Provider,
   subscriptionExchange,
 } from "urql";
-
 import "../styles/globals.css";
 
 let isServer = process.browser ? false : true;
 
-let wsClient: WSClient | null = null;
 let exchanges: Exchange[] = defaultExchanges;
 
 if (!isServer) {
-  wsClient = createWSClient({
+  const wsClient = createWSClient({
     url: "ws://localhost:8000/graphql",
   });
   exchanges = [
@@ -25,7 +23,10 @@ if (!isServer) {
     subscriptionExchange({
       forwardSubscription: (operation) => ({
         subscribe: (sink) => ({
-          unsubscribe: wsClient.subscribe(operation, sink),
+          unsubscribe: wsClient.subscribe(
+            { query: operation.query, variables: operation.variables },
+            sink
+          ),
         }),
       }),
     }),
