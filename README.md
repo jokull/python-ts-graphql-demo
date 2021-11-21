@@ -13,6 +13,10 @@ This is a mini version of the [Inch](https://tryinch.com) tech stack. The schema
 consistency between the backend and frontend. Another benefit is a great VS Code environment that
 highlights any potential errors when communicating with the backend.
 
+For extra sizzle Strawberry subscriptions keep the task list up to date. When a task is created
+the id is published to a `tasks` channel in redis pubsub. Browser have a GraphQL subscription and
+WebSocket set up to receive new tasks.
+
 ![](https://user-images.githubusercontent.com/701/140308942-264f40fa-f6ac-43cf-88f0-b6c4bfdfe105.mp4)
 
 ## Getting started
@@ -28,6 +32,13 @@ Drop and recreate all database tables
 
 ```bash
 poetry run python models.py
+```
+
+Run Redis which is the pubsub to send new tasks via subscriptions
+
+```bash
+# brew install redis
+redis-server
 ```
 
 Run the Python GraphQL backend on port :8000 - Next.js will reverse proxy `/graphql` to here
@@ -52,5 +63,4 @@ npm run dev
 
 Inside `.vscode/settings.json` you'll see how to have nice VS Code mypy errors, import sorting and
 code formatting. Pylance does not yet deal well with declarative type hinted SQLAlchemy models.
-However there are pretty good SQLA type stubs and a mypy plugin. That's why in the settings you'll
-see `python.analysis.typeCheckingMode` switched off and mypy enabled instead.
+However there are pretty good SQLA type stubs for mypy.

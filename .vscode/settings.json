@@ -2,14 +2,7 @@
   "editor.formatOnSave": true,
   "python.linting.flake8Enabled": true,
   "python.linting.mypyEnabled": true,
-  "python.linting.mypyArgs": [
-    "--follow-imports=silent",
-    "--ignore-missing-imports",
-    "--show-column-numbers",
-    "--no-pretty",
-    "--config-file",
-    "${workspaceFolder}/mypy.ini"
-  ],
+  "python.linting.mypyArgs": ["--config-file", "${workspaceFolder}/mypy.ini"],
   "python.linting.enabled": true,
   "python.formatting.provider": "black",
   "python.formatting.blackArgs": [
@@ -17,8 +10,11 @@
     "${workspaceFolder}/pyproject.toml"
   ],
   "python.sortImports.args": ["--settings=pyproject.toml"],
-  "python.analysis.typeCheckingMode": "off",
   "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportGeneralTypeIssues": "none"
+  },
   "python.linting.flake8Args": ["--max-line-length=99"],
   "[python]": {
     "editor.codeActionsOnSave": {
