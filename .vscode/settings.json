@@ -2,13 +2,10 @@
   "editor.formatOnSave": true,
   "python.linting.flake8Enabled": true,
   "python.linting.mypyEnabled": true,
-  "python.linting.mypyArgs": ["--config-file", "${workspaceFolder}/mypy.ini"],
+  "python.linting.mypyArgs": ["--config-file", "mypy.ini"],
   "python.linting.enabled": true,
   "python.formatting.provider": "black",
-  "python.formatting.blackArgs": [
-    "--config",
-    "${workspaceFolder}/pyproject.toml"
-  ],
+  "python.formatting.blackArgs": ["--config", "pyproject.toml"],
   "python.sortImports.args": ["--settings=pyproject.toml"],
   "python.languageServer": "Pylance",
   "python.analysis.typeCheckingMode": "basic",
