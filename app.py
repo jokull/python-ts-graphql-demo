@@ -137,10 +137,6 @@ class Subscription:
             await psub.reset()
 
 
-# # closing all open connections
-# await psub.close()
-
-
 schema = strawberry.Schema(query=Query, mutation=Mutation, subscription=Subscription)
 graphql_app = GraphQL(schema, subscription_protocols=[GRAPHQL_TRANSPORT_WS_PROTOCOL])
 app = Starlette()
