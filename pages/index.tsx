@@ -101,6 +101,9 @@ const AddLocation: React.FC = () => {
         <Locations />
       </div>
       <Input field={name} disabled={fetching} placeholder="New location name" />
+      <button className="overflow-hidden" type="submit">
+          Submit
+       </button>
     </form>
   );
 };
@@ -150,7 +153,7 @@ const AddTask: React.FC = () => {
             placeholder="Location"
           />
         </div>
-        <button className="overflow-hidden w-0" type="submit">
+        <button className="overflow-hidden" type="submit">
           Submit
         </button>
       </form>
