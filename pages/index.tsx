@@ -2,16 +2,18 @@ import { Field, notEmptyString, useField, useForm } from "@shopify/react-form";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  TaskAddedSubscription,
   useAddLocationMutation,
   useAddTaskMutation,
   useLocationsQuery,
+  useTaskAddedSubscription,
   useTasksQuery,
 } from "../graphql";
 
 const Pill: React.FC = ({ children }) => (
-  <div className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-[#0085FF] text-white">
+  <div className="inline-flex items-center px-3 py-0.5 m-1 rounded-full text-sm font-medium bg-[#0085FF] text-white">
     {children}
   </div>
 );
@@ -44,7 +46,7 @@ const Locations: React.FC = () => {
   if (fetching) return <div>Loading</div>;
   if (data?.locations.length === 0) return <div>No locations yet</div>;
   return (
-    <div className="flex flex-wrap space-x-1">
+    <div className="flex flex-wrap -m-1">
       {data?.locations.map(({ name }, index) => (
         <Pill key={index}>{name}</Pill>
       ))}
@@ -55,11 +57,25 @@ const Locations: React.FC = () => {
 const Tasks: React.FC = () => {
   const context = useMemo(() => ({ additionalTypenames: ["Task"] }), []);
   const [{ data, fetching }] = useTasksQuery({ context });
+  const [taskAddedResponse] = useTaskAddedSubscription();
+
+  const [tasksAdded, setTasksAdded] = useState<
+    TaskAddedSubscription["taskAdded"][]
+  >([]);
+
+  useEffect(() => {
+    const taskAdded = taskAddedResponse.data?.taskAdded;
+    if (taskAdded) setTasksAdded((prevState) => [taskAdded, ...prevState]);
+  }, [taskAddedResponse.data?.taskAdded]);
+
   if (fetching) return <div>Loading</div>;
   if (data?.tasks.length === 0) return <div>No tasks yet</div>;
+
+  const tasks = [...tasksAdded, ...(data?.tasks || [])];
+
   return (
-    <div className="flex flex-wrap space-x-1">
-      {data?.tasks.map(({ name, location }, index) => (
+    <div className="flex flex-wrap -m-1">
+      {tasks.map(({ name, location }, index) => (
         <Pill key={index}>
           {name} {location && `at ${location.name}`}
         </Pill>
@@ -126,11 +142,11 @@ const AddTask: React.FC = () => {
     makeCleanAfterSubmit: false,
     onSubmit: async ({ name, locationName }) => {
       const { data } = await mutation({ name, locationName });
-      // if (data?.addTask.__typename === "LocationNotFound")
-      //   return {
-      //     status: "fail",
-      //     errors: [{ message: data.addTask.message, field: ["locationName"] }],
-      //   };
+      if (data?.addTask.__typename === "LocationNotFound")
+        return {
+          status: "fail",
+          errors: [{ message: data.addTask.message, field: ["locationName"] }],
+        };
       reset();
       return { status: "success" };
     },
@@ -175,7 +191,7 @@ const Home: NextPage = () => {
 
       <main className="max-w-2xl mx-auto p-4 min-h-screen flex flex-col justify-center">
         <h1 className="flex">
-          <div className="text-4xl md:text-7xl md:text-center font-extrabold">
+          <div className="text-7xl md:text-center font-extrabold">
             Mini Inch
           </div>
           <div className="pl-4 pt-5 w-16">

@@ -1,3 +1,12 @@
+fragment TaskFields on Task {
+  id
+  name
+  location {
+    id
+    name
+  }
+}
+
 query Tasks {
   tasks {
     ...TaskFields
@@ -10,14 +19,6 @@ query Locations {
   }
 }
 
-fragment TaskFields on Task {
-  id
-  name
-  location {
-    name
-  }
-}
-
 fragment LocationFields on Location {
   id
   name
@@ -26,10 +27,10 @@ fragment LocationFields on Location {
 mutation AddTask($name: String!, $locationName: String!) {
   addTask(name: $name, locationName: $locationName) {
     __typename
-    # ... on LocationNotFound {
-    #   __typename
-    #   message
-    # }
+    ... on LocationNotFound {
+      __typename
+      message
+    }
     ... on Task {
       __typename
       ...TaskFields
@@ -48,5 +49,12 @@ mutation AddLocation($name: String!) {
       __typename
       ...LocationFields
     }
+  }
+}
+
+subscription TaskAdded {
+  taskAdded {
+    __typename
+    ...TaskFields
   }
 }

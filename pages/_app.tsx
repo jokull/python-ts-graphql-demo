@@ -1,24 +1,41 @@
+import { createClient as createWSClient } from "graphql-ws";
 import type { AppProps } from "next/app";
-import { cacheExchange, createClient, Provider } from "urql";
-import "../styles/globals.css";
 import "tailwindcss/tailwind.css";
-import { GetTasksDocument } from "../graphql";
+import {
+  createClient,
+  defaultExchanges,
+  Exchange,
+  Provider,
+  subscriptionExchange,
+} from "urql";
+import "../styles/globals.css";
+
+let isServer = process.browser ? false : true;
+
+let exchanges: Exchange[] = defaultExchanges;
+
+if (!isServer) {
+  const wsClient = createWSClient({
+    url: "ws://localhost:8000/graphql",
+  });
+  exchanges = [
+    ...defaultExchanges,
+    subscriptionExchange({
+      forwardSubscription: (operation) => ({
+        subscribe: (sink) => ({
+          unsubscribe: wsClient.subscribe(
+            { query: operation.query, variables: operation.variables },
+            sink
+          ),
+        }),
+      }),
+    }),
+  ];
+}
 
 const client = createClient({
   url: "http://localhost:3000/graphql",
-});
-
-cacheExchange({
-  updates: {
-    Mutation: {
-      addTodo(result, _args, cache, _info) {
-        cache.updateQuery({ query: GetTasksDocument }, (data) => {
-          data.tasks.push(result.addTask);
-          return data;
-        });
-      },
-    },
-  },
+  exchanges,
 });
 
 function MyApp({ Component, pageProps }: AppProps) {

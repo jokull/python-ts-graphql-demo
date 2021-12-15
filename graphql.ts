@@ -1,6 +1,7 @@
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -16,7 +17,7 @@ export type Scalars = {
 
 export type AddLocationResponse = Location | LocationExists;
 
-export type AddTaskResponse = Task;
+export type AddTaskResponse = LocationNotFound | Task;
 
 export type Location = {
   __typename?: 'Location';
@@ -26,6 +27,11 @@ export type Location = {
 
 export type LocationExists = {
   __typename?: 'LocationExists';
+  message: Scalars['String'];
+};
+
+export type LocationNotFound = {
+  __typename?: 'LocationNotFound';
   message: Scalars['String'];
 };
 
@@ -42,7 +48,7 @@ export type MutationAddLocationArgs = {
 
 
 export type MutationAddTaskArgs = {
-  locationName?: Maybe<Scalars['String']>;
+  locationName?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
 };
 
@@ -52,6 +58,11 @@ export type Query = {
   tasks: Array<Task>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  taskAdded: Task;
+};
+
 export type Task = {
   __typename?: 'Task';
   id: Scalars['ID'];
@@ -59,17 +70,17 @@ export type Task = {
   name: Scalars['String'];
 };
 
+export type TaskFieldsFragment = { __typename?: 'Task', id: string, name: string, location?: { __typename?: 'Location', id: string, name: string } | null | undefined };
+
 export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TasksQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined }> };
+export type TasksQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', id: string, name: string, location?: { __typename?: 'Location', id: string, name: string } | null | undefined }> };
 
 export type LocationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LocationsQuery = { __typename?: 'Query', locations: Array<{ __typename?: 'Location', id: string, name: string }> };
-
-export type TaskFieldsFragment = { __typename?: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined };
 
 export type LocationFieldsFragment = { __typename?: 'Location', id: string, name: string };
 
@@ -79,7 +90,7 @@ export type AddTaskMutationVariables = Exact<{
 }>;
 
 
-export type AddTaskMutation = { __typename?: 'Mutation', addTask: { __typename: 'Task', id: string, name: string, location?: { __typename?: 'Location', name: string } | null | undefined } };
+export type AddTaskMutation = { __typename?: 'Mutation', addTask: { __typename: 'LocationNotFound', message: string } | { __typename: 'Task', id: string, name: string, location?: { __typename?: 'Location', id: string, name: string } | null | undefined } };
 
 export type AddLocationMutationVariables = Exact<{
   name: Scalars['String'];
@@ -88,11 +99,17 @@ export type AddLocationMutationVariables = Exact<{
 
 export type AddLocationMutation = { __typename?: 'Mutation', addLocation: { __typename: 'Location', id: string, name: string } | { __typename: 'LocationExists', message: string } };
 
+export type TaskAddedSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TaskAddedSubscription = { __typename?: 'Subscription', taskAdded: { __typename: 'Task', id: string, name: string, location?: { __typename?: 'Location', id: string, name: string } | null | undefined } };
+
 export const TaskFieldsFragmentDoc = gql`
     fragment TaskFields on Task {
   id
   name
   location {
+    id
     name
   }
 }
@@ -129,6 +146,10 @@ export const AddTaskDocument = gql`
     mutation AddTask($name: String!, $locationName: String!) {
   addTask(name: $name, locationName: $locationName) {
     __typename
+    ... on LocationNotFound {
+      __typename
+      message
+    }
     ... on Task {
       __typename
       ...TaskFields
@@ -158,4 +179,16 @@ export const AddLocationDocument = gql`
 
 export function useAddLocationMutation() {
   return Urql.useMutation<AddLocationMutation, AddLocationMutationVariables>(AddLocationDocument);
+};
+export const TaskAddedDocument = gql`
+    subscription TaskAdded {
+  taskAdded {
+    __typename
+    ...TaskFields
+  }
+}
+    ${TaskFieldsFragmentDoc}`;
+
+export function useTaskAddedSubscription<TData = TaskAddedSubscription>(options: Omit<Urql.UseSubscriptionArgs<TaskAddedSubscriptionVariables>, 'query'> = {}, handler?: Urql.SubscriptionHandler<TaskAddedSubscription, TData>) {
+  return Urql.useSubscription<TaskAddedSubscription, TData, TaskAddedSubscriptionVariables>({ query: TaskAddedDocument, ...options }, handler);
 };
